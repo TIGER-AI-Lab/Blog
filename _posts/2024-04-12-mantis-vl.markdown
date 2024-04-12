@@ -1,0 +1,219 @@
+---
+layout: post
+title:  "Mantis-VL"
+date:   2024-04-12 02:21:59 -0400
+author: Dongfu Jiang, Xuan He, Huaye Zeng, Cong Wei, Max Ku, Qian Liu, Wenhu Chen
+categories: jekyll update
+---
+
+## Introduction
+The recent emergence of Large Multimodal Models (LMMs) such as GPT-4V[^1] and Gemini[^2] has shown strong visual-language understanding and generation capabilities in many areas, like image captioning and visual question answering. Despite obtaining the remarkable performance on most visual-language datasets, their ability to reason about multiple images has yet to be explored. Recently, there has been relatively fewer work in exploring LMMs' capability to reason over multiple images. Recently, Mementos[^3] has attempted to benchmark LMMs' ability to comprehend image sequences and observed that the recent LMMs besides GPT-4V are achieving F1 score below 40%. In this work, we aim to enhance LMMs' capability to reason over multiple images, which include different scenarios: (1) understanding actions in multiple video frames, (2) understanding differences between images, (3) high-level operations over multiple images.
+
+## MIIT: Multi-Image Instruction Tuning
+
+### Methodology
+To train a model with multi-image reasoning ability, the model structure should be able to support embedding image patches with text token embeddings. Fuyu is a decoder-only LMM with no separate image encoder, which processes image tokens the same as text tokens. Therefore, it can naturally be modified with just the training and inference codes to support interleaved image inputs. However, due to Fuyu's high-resolution feature, the number of image tokens increases rapidly as the image gets larger, with a maximum of `1920x1080 / 30^2 = 2304` for each image, thus demanding a high context length during the training and inference. Besides Fuyu, we also consider LLaVA, which uses a CLIP encoder to first transform every image into a fixed number of image tokens, which is `(336/14)^2=576` for LLaVa-1.5. Since LLaVA-1.5's max positional embedding size is 4096, it can accept about 7 images at most, which is acceptable considering our goals and GPU resources. Therefore, we have decided to use LLaVA-1.5 as the base model for our experiments.
+
+Besides the model structure consideration, it's also important to design a proper data format for our model. Similar to LLaVA, we use `<image>` as the placeholder of each image in the text, indicating where the image tokens will be inserted. However, in the multi-image scenario, the boundaries between images and the serial order of the images are not explicitly specified, thus making it hard for the model to learn it implicitly through the position embeddings. This ability decides whether the model can clarify the relationship between text denotation for the image and the actual image patches denoted. Therefore, for each `<image>` token, we will automatically replace all the images into the following format: `(image {i}: <Image><image></Image>)`, where `i` is the serial number in the sequence of images. The advantage of this technique is to build a proper attention mapping from the text image denotation to the actual image embeddings, making the learning process easier.
+
+Similar to visual instruction tuning[^4], data curation is an important step to ensure good performance. During the curation, we have found some heuristics that can improve the performance. We list them below. These heuristics are applied in the curation of the dataset, which is described in further detail elsewhere[^5].
+
+1. **Conflicts between short answers and long answers.** Many datasets we collected are domain-specific, and some of them are classification tasks like NLVR2[^6] and DreamSim[^7]. For these datasets, we convert them into multiple-choice QA format to avoid conflicts between repeated short-answers and some long answers from other datasets.
+2. **Addition of image denotation in the text for each question.**
+   We manually add image denotations like "the first image", "image 2", "the right image", etc. to each question in our dataset to make sure the question involved with multiple images is clear to answer.
+3. **Positions of the `<image>` placeholder.**
+   For each item with multiple images, we write some rules to randomly put the image placeholders at the beginning of the first question or the end of the first question. This technique is also used by the curation LLaVA-665k[^8].
+
+For now, the effects of these heuristics are not well-investigated and quantized due to the limited time and resources. We aim to investigate further in the future work.
+
+
+### MIQA: A large scale Multi-Image Question Answering dataset
+
+
+| Subsets                | # Examples (k) | # Avg image | # Max image | # Avg Turns | Avg Length(T) | Avg Length (T&I) |
+|------------------------|----------------|-------------|-------------|-------------|----------------|---------------------|
+| NLVR2                  | 86.37          | 2.00        | 2           | 2.00        | 105            | 1257                |
+| Birds-to-words         | 2.65           | 2.00        | 2           | 2.00        | 101            | 1253                |
+| Dreamsim               | 15.94          | 3.00        | 3           | 2.00        | 103            | 1831                |
+| Contrastive Captioning | 35.98          | 3.81        | 8           | 7.62        | 871            | 3067                |
+| Spot-the-diff          | 8.01           | 2.00        | 2           | 3.99        | 121            | 1273                |
+| Llava-665k-merged      | 312.61         | 1.99        | 4           | 21.44       | 558            | 1710                |
+| LRV-merged             | 8.45           | 3.50        | 9           | 83.37       | 2234           | 4251                |
+| Nexqa                  | 3.87           | 8.00        | 8           | 17.64       | 572            | 5180                |
+| Star                   | 3.03           | 8.00        | 8           | 30.16       | 961            | 5569                |
+| Visual story telling   | 6.66           | 20.33       | 50          | 9.71        | 530            | 12238               |
+| Coinstruct             | 150.92         | 2.67        | 4           | 7.45        | 314            | 1620                |
+| Dvqa                   | 200.00         | 1.00        | 1           | 40.00       | 304            | 880                 |
+| Docvqa                 | 39.46          | 1.00        | 1           | 2.00        | 62             | 638                 |
+| Chartqa                | 28.30          | 1.00        | 1           | 2.00        | 66             | 642                 |
+
+*Table 1: The statistics of MIQA datasets. We list the number of examples, average images per example, maximum image per example, average turns, average text token lengths, and average text+image token lengths. Here we use Llava's tokenizer and assume each image occupies 576 image tokens, which is the number of tokens each image will be converted to in Llava model. Here "Avg Length(T)" denotes the average number of tokens for the text part, while "Avg Length(T&I)" means the average number of tokens of text and images in total.*
+
+
+We curate datasets from multiple publicly available datasets to satisfy the training requirements above, forming MIQA. Detailed statistics of MIQA are shown in Table 1. We use a similar dataset format with LLaVA's, where each data item contains multiple images and multiple turns of QA pairs are gathered. We report the number of examples, the number of images per item, the average conversation turns, and the average length.
+
+We describe the task type of each dataset and the processing techniques used in the followings:
+
+#### Spot-the-diff
+This is a dataset which requires the model to generate the difference description given 2 images. We use the processed version from MIMIC-IT[^9].
+
+#### Birds-to-words
+The task of this dataset is to generate different descriptions and give 2 images of different birds. We directly take the training split for training. Besides, we prompt GPT-3.5-turbo to generate a possible question given the reference answer, so we can get a diverse question pool[^10].
+
+#### Dreamsim
+DreamSim proposes a dataset to train a model to judge image similarity. We reuse their datasets, and the task is to judge which image of the 2 candidate images is more similar to the given reference image[^11].
+
+#### NLVR2
+NLVR2 is a natural language reasoning dataset grounded in images. The task is to determine whether a statement is true or false given the visual contents of 2 images. NLVR2 covers many linguistic phenomena, such as cardinality, existential quantifiers, universal quantifiers, etc.[^12].
+
+#### Contrastive captioning
+Inspired by the paradigm of contrastive learning, we reformat existing image captioning tasks into a multi-image version, where 2 tasks are defined. Given multiple images, the first task we defined is to judge which image matches the provided caption, and the second task is to generate a caption for a denoted image. We randomly select 2 to 8 images along with their captions to form a single item, then apply the template of the 2 tasks defined. We used the images and captions provided by ShareGPT-4V[^13] and LAION GPT-4V captions from LVIS[^14].
+
+#### Co-Instruct
+Co-Instruct is a dataset curated to compare the quality of 2-4 images in the format of open-ended answer or multi-choice QA format. It's similar to the tasks in the Qbench[^15].
+
+#### Video QA
+We also include some video question answering datasets, including nextqa[^16], star[^17], and visual-story-telling[^18]. nextqa and star are the processed version from Flipped-VQA[^19]. The visual-story-telling are the processed version from MIMIC-IT[^9].
+
+#### LLaVA-665k-merged
+Besides the above-mentioned multi-image reasoning tasks, we also manually reformat the LLaVA-655k dataset from LLaVA-1.5 into a "fake" multi-image dataset. We randomly merge 2 to 4 original data items of a single image into a multi-image data item. Then add proper image denotation like "For the second image, ..." for each question. Then we shuffle all the conversation pairs to form the final merge items. It's a "fake" multi-image dataset because answering each question in the conversation does not require reasoning across images. However, due to the quality and diversity of the LLaVA-665k data, we contend that it's helpful for avoiding forgetting via replaying and increasing instruction-following ability.
+
+#### LRV-merged
+This is a single-image dataset used to mitigate hallucinations of LMMs. We process it similarly to LLaVA-665k-merged[^4] to get a "fake" multi-image dataset.
+
+#### Single-image-QA
+Instead of focusing only on multi-image tasks, we claim that it's necessary to also include some single-image VQA datasets to avoid the model forgetting ability on single-image reasoning. We included some of the single image data from LLaVA-665k. Inspired by LLaVA-NeXT, we also add DocVQA, DVQA, and ChartQA to enhance its ability on diagrams and OCR. In practice, since the size of DVQA is too large, we only use 30k output 200k of it for the training.
+
+### Training details
+We have trained multiple versions of our models with different dataset-mixing strategies and different backbones. Finally, we select 2 versions called `Mantis-7b-v1.0` based on[LLaVA-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf), where the training context length is set to 4096, and `Mantis-7b-v1.1` based on[bakLlava-v1-hf](https://huggingface.co/llava-hf/bakLlava-v1-hf), where the training context length is set to 8192. `Mantis-7b-v1.0` is not trained on coinstrut, while `Mantis-7b-v1.1` is trained on all the datasets in `datasetname`.
+
+We train each model on the data for 1 epoch, with a batch size of 128. The learning rate is set to 1e-5, which is half of the learning rate used in LLaVA-1.5's instruction-tuning. We set the warmup ratio to be 0.03 and use a cosine learning rate scheduler. We speed up our training and inference with the help of [Flash-attention2](https://example.com/dao2023flashattention2). The training ran on 16 A100 (40G) GPUs for about 36 hours.
+
+
+## Experiments
+
+### Baselines
+For the MIQA-eval evaluation, we have included some famous LMMs like BLIP-2, InstructBlip, Qwen-VL, LLaVA, Kosmos2, and Fuyu. Since these models cannot accept multiple images as input, we deliberately merge the images into a single one, putting them side by side so that they can serve as the baselines.
+
+For Qbench's evaluation, we include the public leaderboard's results on the Perception(A1-Pair, dev) of Qbench. For mementos's evaluation, we include the numbers reported in their paper as baselines for comparison.
+
+### Evaluation benchmarks 
+We mainly report results on 5 benchmarks, where 2 of them are held-in datasets (NLVR2, Birds-to-words), and 3 of them are held-out datasets (Human-eval, Mementos, Q-bench-2).
+
+### NLVR2
+NLVR2 evaluates the model's ability to conduct logical reasoning across the contents of images via a judgment of a statement.
+
+### Birds-to-words
+Birds-to-Worlds is reformatted into a multi-choice dataset by GPT-3.5-turbo providing the reference difference description, evaluating the model's ability to identify the difference between 2 images.
+
+### Human-eval
+We have also curated 200+ multiple-image inference examples that cover different topics, including topics like "Is the <object> in image 1 smaller than the <object> in image 2?", "Does one image seem to be taken at a different time of day than the other?", etc. These images are collected by our annotators via Google Search, and then come up with a proper question for the chosen topics. They are all multi-choice questions.
+
+### Mementos
+Mementos is a benchmark to test multiple image sequence reasoning ability. It evaluates whether LMMs can accurately capture the contents in the image sequences, understand the situations, and then generate a detailed description of the provided image sequence. The evaluation will require GPT-4 to extract an action list and an object list described in the generated text, then compare with the reference description with precision, recall, and F1-score.
+
+### QBench
+QBench is a benchmark evaluating whether LMMs can properly judge and compare the quality of a benchmark. They are all multi-choice questions.
+
+## Results
+### Evaluation on MIQA-eval
+
+| Models          | NLVR2 | Birds-to-words | MIQA-eval |
+|-----------------|-------|----------------|------------|
+| Random          | 48.93 | 31.16          | 23.04      |
+| Blip-2          | 59.42 | 45.70          | 49.77      |
+| InstructBlip    | 60.26 | 42.43          | 45.62      |
+| QwenVL          | 58.72 | 31.45          | 39.17      |
+| Llava           | 53.88 | 36.20          | 31.34      |
+| Kosmos2         | 49.00 | 31.75          | 30.41      |
+| fuyu            | 51.10 | 28.19          | 27.19      |
+| Mantis-7b-v1.0  | **84.93** | **52.52**  | 45.16      |
+| Mantis-7b-v1.1  | 82.98 | 43.62          | **50.69**  |
+
+*Table 2: The performance of Mantis-7b-v1.0 and Mantis-7b-v1.1 on NLVR2, Birds-to-words, and MIQA-eval evaluation.*
+
+We report results on birds-to-words, NLVR2, and our curated human-eval benchmark. As shown in the table, our model achieves decent performance on the benchmarks. Specifically, Mantis-7b-v1.0 gets 84.93 on NLVR2 and 52.52 accuracies on Birds-to-words. Mantis-7b-v1.1 gets 50.69 on the Human-eval subset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
+
+### Evaluation on Qbench2
+
+| Models                        | Acc   |
+|-------------------------------|-------|
+| InfiMM (Zephyr-7B)            | 42.95 |
+| Emu2-Chat (LLaMA-33B)         | 50.05 |
+| Fuyu-8B (Persimmon-8B)        | 49.15 |
+| BakLLava (Mistral-7B)         | 50.94 |
+| mPLUG-Owl2 (Q-Instruct)       | 50.54 |
+| mPLUG-Owl2 (LLaMA-7B)         | 49.85 |
+| LLaVA-v1.5 (Vicuna-v1.5-7B)   | 49.32 |
+| LLaVA-v1.5 (Vicuna-v1.5-13B)  | 49.85 |
+| Qwen-VL-Plus (Close-Source)   | 60.70 |
+| Qwen-VL-Max (Close-Source)    | 67.27 |
+| Gemini-Pro (Close-Source)     | 57.64 |
+| GPT-4V (Close-Source)         | 76.52 |
+| Mantis-7b-v1.0                | 52.30 |
+| Mantis-7b-v1.1                | **72.00** |
+
+*Table 3: The performance of Mantis-7b-v1.0 and Mantis-7b-v1.1 on Qbench2-A1-single-dev evaluation.*
+
+On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses all previous open-source LMMs reported in the leaderboard. After introducing the co-instruct training data, the performance further increases to 72.00 accuracy, which surpasses 3 close-source models and is only behind GPT-4V by 4.52. However, there are some performance decreases on the 2 held-in datasets NLVR2 and Birds-to-words. We attribute it to be the trade-off across various datasets. Besides, the performance on the held-in evaluation dataset after the decreases of our model still surpasses the baseline models for the NLVR2 dataset. For Birds-to-words evaluation datasets, our model is only behind BLIP2 by 2.08.
+
+### Evaluation on Mementos
+
+![Table 4: The performance of Mantis-7b-v1.1 on Mementos evaluation.](/assets/Mantis/images/mementos.jpeg)
+
+<!-- *Table 4: The performance of Mantis-7b-v1.1 on Mementos evaluation.* -->
+We also evaluated our model on the Mementos benchmark on the 3 subdomains, daily life, robotics, and comics. Results are shown as follows: For the daily-life domain, our model gets 36.62% F1-score for the object recognition, which is on par with Gemini. Additionally, we get 29.80% F1-score for the behavior recognition, which surpasses all other models except GPT-4. Our precision reaches 38.88% for the daily-life behavior recognition, which is the best across all the models, even better than GPT-4. This demonstrates our model's great capability to capture dynamic various across multiple image sequences.
+
+Similarly, on the other 2 subdomains, we achieve 32.38% F1-score for behavior recognition on robotics, which is way better than in previous LMMs like LLaVA-1.5 (17.95%), and Chat-UniVi (21.14%). This performance is close to GPT-4's 33.95%. On the comics domain, our model achieves a 15.99% F1-score for behavior recognition, which surpasses previous LMMs like LLaVA-1.5 by 5.72% and is only behind GPT-4V and Gemini.
+
+While we observe significant performance improvements in behavior recognition, it's also worth noting that our model, Mantis-7b-v1.1, has experienced some performance drops on the object recognition task compared to the LLaVA-1.5 models. We believe this decline is due to our training datasets being mostly comprised of tasks that require multi-image reasoning ability, thus decreasing the recognition ability for a single static image as a trade-off. This phenomenon is akin to the insect mantis, which is adept at recognizing moving and dynamic objects but struggles with static objects. This similarity is why we have named our model after this insect.
+
+## Future Work
+
+
+## References
+
+[^1]: Achiam, J. (2023). GPT-4 Technical Report.
+[^2]: Team, C. (2023). Gemini: Understanding visual-language interactions.
+[^3]: Wang, L. (2024). Mementos: Benchmarking the understanding of image sequences.
+[^4]: Liu, Visual Instruction Tuning: Enhancing Visual Models with Instruction-Based Tuning.
+[^5]: Detailed section in supplementary materials.
+[^6]: Suhr et al. (2018). NLVR2: Understanding the role of images in model training.
+[^7]: Fu (2023). DreamSim: Simulated Dreams and Learning.
+[^8]: Liu et al. (2023). Improved Batch Weighting for LLaVA-665k: A Study on Effective Training Techniques.
+[^9]: Li et al. (2023). MIMIC-IT
+[^10]: Forbes et al. (2019). Neural Network Generation of Questions for Question Answering.
+[^11]: Fu et al. (2023). DreamSim: Simulated Dreams and Learning.
+[^12]: Suhr et al. (2018). NLVR2: Understanding the role of images in model training.
+[^13]: Chen et al. (2023). ShareGPT-4V: Sharing Visual-Language Models.
+[^14]: LAION (2023). LVIS: Large Vocabulary Instance Segmentation.
+[^15]: Wu et al. (2023). QBench: A Benchmark for Question Answering.
+[^16]: Xiao et al. (2021). NExTQA: A Benchmark for Video Question Answering.
+[^17]: Wu et al. (2021). STAR: A Benchmark for Video Question Answering.
+[^18]: Huang et al. (2016). Visual Storytelling.
+[^19]: Ko et al. (2023). Flipped-VQA: 
+
+<!-- 
+You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
+
+Jekyll requires blog post files to be named according to the following format:
+
+`YEAR-MONTH-DAY-title.MARKUP`
+
+Where `YEAR` is a four-digit number, `MONTH` and `DAY` are both two-digit numbers, and `MARKUP` is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.
+
+Jekyll also offers powerful support for code snippets:
+
+{% highlight ruby %}
+def print_hi(name)
+  puts "Hi, #{name}"
+end
+print_hi('Tom')
+#=> prints 'Hi, Tom' to STDOUT.
+{% endhighlight %}
+
+Check out the[Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at[Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on[Jekyll Talk][jekyll-talk].
+
+[jekyll-docs]: https://jekyllrb.com/docs/home
+[jekyll-gh]:   https://github.com/jekyll/jekyll
+[jekyll-talk]: https://talk.jekyllrb.com/ -->
