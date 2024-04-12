@@ -7,41 +7,34 @@ author: Dongfu Jiang, Xuan He, Huaye Zeng, Cong Wei, Max Ku, Qian Liu, Wenhu Che
 ---
 
 ## Introduction
-The recent emergence of Large Multimodal Models (LMMs) such as GPT-4V[^1] and Gemini[^2] has shown strong visual-language understanding and generation capabilities in many areas, like image captioning and visual question answering. Despite obtaining the remarkable performance on most visual-language datasets, their ability to reason about multiple images has yet to be explored. Recently, there has been relatively fewer work in exploring LMMs' capability to reason over multiple images. Recently, Mementos[^3] has attempted to benchmark LMMs' ability to comprehend image sequences and observed that the recent LMMs besides GPT-4V are achieving F1 score below 40%. In this work, we aim to enhance LMMs' capability to reason over multiple images, which include different scenarios: (1) understanding actions in multiple video frames, (2) understanding differences between images, (3) high-level reasoning over multiple images.
 
-To achieve these goals, we propose **Multi-Image Instruction Tuning (MIIT)** inspired by the LLaVA's visual instruction tuning [^4]. We aim to extend existing single-image LMM's ability to multiple-image scenarios, which we hypothesize should be achieved with properly curated instruction-tuning datasets, without the need to train a new LMM from scratch. Incorporating multiple images in the training dataset also implicitly makes contrastive learning across images and texts possible, which has been proven to be a simple yet effective method for enhancing video understanding ability. 
+While many previous works have focused on single-image reasoning tasks, the ability to reason over multiple images is still an open challenge. **Can we enhance large multimodal models with multi-image reasoning ability via instruction tuning?**. To achieve this goal, we propose **Mantis**, a series of LMMs with decent multi-image reasoning ability, achieving SOTA performance on a series of multi-image benchmarks. Mantis is trained on the newly curated dataset **Mantis-Instruct**, a large-scale multi-image QA dataset that covers various multi-image reasoning tasks.
 
-In short, our contributions to this paper can be listed as follows:
-1. **We propose MIIT**, a new training paradigm for LMMs to equip them with multi-image understanding and reasoning ability via multi-image instruction tuning.
-2. **We open-source the training and inference codes**, which support free-form text-image interleaved format to facilitate the development of multi-image LMMs in the community.
-3. **We release Mantis-Instruct**, a large-scale multi-image QA dataset curated from current publicly available datasets, which is used for `methodname`'s instruction tuning.
-4. **We announce Mantis**, a series of LMMs with decent multi-image reasoning ability based on Llava, achieving SOTA performance on a series of multi-image benchmarks.
+[Resources]((#resources)) are listed at the end of the blog.
 
 ## Methodology
 
-To train a model with multi-image reasoning ability, the model structure should be able to support embedding image patches with text token embeddings. Fuyu is a decoder-only LMM with no separate image encoder, which processes image tokens the same as text tokens. Therefore, it can naturally be modified with just the training and inference codes to support interleaved image inputs. However, due to Fuyu's high-resolution feature, the number of image tokens increases rapidly as the image gets larger, with a maximum of `1920x1080 / 30^2 = 2304` for each image, thus demanding a high context length during the training and inference. Besides Fuyu, we also consider LLaVA, which uses a CLIP encoder to first transform every image into a fixed number of image tokens, which is `(336/14)^2=576` for LLaVa-1.5. Since LLaVA-1.5's max positional embedding size is 4096, it can accept about 7 images at most, which is acceptable considering our goals and GPU resources. Therefore, we have decided to use LLaVA-1.5 as the base model for the first version of Mantis, called **Mantis-llava**. (Mantis-Fuyu will be released in the future.)
+We have modifed the famous Fuyu and LLaVA's training and inference codes to support **interleaved text-image inputs**. In this version, we use LLaVA-1.5 as the base model for the first version of Mantis, called **Mantis-llava**. (Mantis-Fuyu will be released in the future.)
 
-Besides the model structure consideration, it's also important to design a proper data format for our model. Similar to LLaVA, we use `<image>` as the placeholder of each image in the text, indicating where the image tokens will be inserted. However, in the multi-image scenario, the boundaries between images and the serial order of the images are not explicitly specified, thus making it hard for the model to learn it implicitly through the position embeddings. This ability decides whether the model can clarify the relationship between text denotation for the image and the actual image patches denoted. Therefore, for each `<image>` token, we will automatically replace all the images into the following format: `(image {i}: <Image><image></Image>)`, where `i` is the serial number in the sequence of images. The advantage of this technique is to build a proper attention mapping from the text image denotation to the actual image embeddings, making the learning process easier.
+Similar to LLaVA, we use `<image>` as the placeholder of each image in the text. Besides, for each `<image>` token, we will automatically replace all the images into the following format: `(image {i}: <Image><image></Image>)`, where `i` is the serial number in the sequence of images. 
 
 ## Mantis-Instruct: A large scale Multi-Image Question Answering dataset
 
 ![Figure 2: Illustrations of parts of the datasets in Mantis-Instruct]({{"/assets/Mantis/images/mantis-instruct-cases.jpeg" | relative_url }})
 
-We curate datasets from multiple publicly available datasets to satisfy the training requirements above, forming Mantis-Instruct. We use a similar dataset format with LLaVA's, where the difference is that each data item contains multiple images. Multiple turns of QA pairs are gathered for each item.
-
-Mantis-Instruct can mainly be divided into 3 parts. 
+We curate datasets from multiple publicly available datasets to satisfy the training requirements above, forming Mantis-Instruct. The dataset is divided into 4 parts:
 
 **1. Multi-Image Reasoning.**
-The first parts comes from existing datasets where multiple images are involved, including Spot-the-diff, Birds-to-words, Dreamsim, NLVR2. These dataset all involve reasoning across multiple images, including tasks like difference description, image similarity judgment, and logical reasoning across images. We format Spot-the-diff and Birds-to-words into a long-answer QA format, while Dreamsim and NLVR2 are formatted into a multi-choice QA format.
+The first parts comes from existing datasets where multiple images are involved, including Spot-the-diff, Birds-to-words, Dreamsim, NLVR2. These dataset all involve reasoning across multiple images.
 
 **2. Contrastive Captioning.**
-The second part is the newly curated dataset, including Contrastive Captioning. Since the original image captioning tasks are single-image tasks, we reformat them into a multi-image version. After providing multiple images, we define 2 kinds of tasks, called `Caption Matching` and `Caption Generation`. For the `Caption Matching` task, the model needs to judge which image matches the provided caption. For the `Caption Generation` task, the model needs to generate a caption for a denoted image, like image 2. We randomly select 2 to 8 images along with their captions to form a single item, then apply the template of the 2 tasks defined.
+The second part is the newly curated dataset from existing captioning datasets, ShareGPT-4V, and LAION-GPT4-Vision. Give multiple images, the model need to generate a caption for a specific image (`Caption Generation`), or judge which image matches the provided caption (`Caption Matching`).
 
 **3. Multi-Image Instruction Following.**
-The third part reformats previous single-image multi-turn instruction-following datasets into a multi-image version, including LLaVA-665k-merged, LRV-Instruction-merged. We randomly merge 2 to 4 original data items of a single image into a multi-image data item. Then add proper image denotation like `For the second image, ...` for each question. 
+The third part reformats previous single-image multi-turn instruction-following datasets into a multi-image version, including LLaVA-665k-merged, LRV-Instruction-merged. We add proper image denotation like `For the second image, ...` for each question. 
 
 **4. Single-Image Reasoning.**
-Instead of focusing only on multi-image tasks, we claim that it's necessary to also include some single-image VQA datasets to avoid the model forgetting ability on single-image reasoning. We included some of the single image data from LLaVA-665k. Inspired by LLaVA-NeXT, we also add DocVQA, DVQA, and ChartQA to enhance its ability on diagrams and OCR. In practice, since the size of DVQA is too large, we only use 30k output 200k of it for the training.
+Similar to LLaVA-NeXT, we include DocVQA, DVQA, and ChartQA to enhance the model's ability on diagrams and OCR. This is also to avoid the model forgetting ability on single-image reasoning.
 
 ## Experiment Results
 
