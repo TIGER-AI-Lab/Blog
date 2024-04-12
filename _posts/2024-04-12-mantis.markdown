@@ -159,9 +159,8 @@ On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses a
 
 ### Evaluation on Mementos
 
-![Table 4: The performance of Mantis-7b-v1.1 on Mementos evaluation.](/assets/Mantis/images/mementos.jpeg)
+![Table 4: The performance of Mantis-7b-v1.1 on Mementos behavior recognition evaluation.]({{"/assets/img/kitty.png" | relative_url }})
 
-<!-- *Table 4: The performance of Mantis-7b-v1.1 on Mementos evaluation.* -->
 We also evaluated our model on the Mementos benchmark on the 3 subdomains, daily life, robotics, and comics. Results are shown as follows: For the daily-life domain, our model gets 36.62% F1-score for the object recognition, which is on par with Gemini. Additionally, we get 29.80% F1-score for the behavior recognition, which surpasses all other models except GPT-4. Our precision reaches 38.88% for the daily-life behavior recognition, which is the best across all the models, even better than GPT-4. This demonstrates our model's great capability to capture dynamic various across multiple image sequences.
 
 Similarly, on the other 2 subdomains, we achieve 32.38% F1-score for behavior recognition on robotics, which is way better than in previous LMMs like LLaVA-1.5 (17.95%), and Chat-UniVi (21.14%). This performance is close to GPT-4's 33.95%. On the comics domain, our model achieves a 15.99% F1-score for behavior recognition, which surpasses previous LMMs like LLaVA-1.5 by 5.72% and is only behind GPT-4V and Gemini.
