@@ -25,6 +25,8 @@ Besides the model structure consideration, it's also important to design a prope
 
 ## Mantis-Instruct: A large scale Multi-Image Question Answering dataset
 
+![Figure 2: Illustrations of parts of the datasets in Mantis-Instruct]({{"/assets/Mantis/images/mantis-instruct-cases.jpeg" | relative_url }})
+
 We curate datasets from multiple publicly available datasets to satisfy the training requirements above, forming Mantis-Instruct. We use a similar dataset format with LLaVA's, where the difference is that each data item contains multiple images. Multiple turns of QA pairs are gathered for each item.
 
 Mantis-Instruct can mainly be divided into 3 parts. 
