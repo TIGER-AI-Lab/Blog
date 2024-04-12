@@ -7,46 +7,25 @@ author: Dongfu Jiang, Xuan He, Huaye Zeng, Cong Wei, Max Ku, Qian Liu, Wenhu Che
 ---
 
 ## Introduction
-The recent emergence of Large Multimodal Models (LMMs) such as GPT-4V[^1] and Gemini[^2] has shown strong visual-language understanding and generation capabilities in many areas, like image captioning and visual question answering. Despite obtaining the remarkable performance on most visual-language datasets, their ability to reason about multiple images has yet to be explored. Recently, there has been relatively fewer work in exploring LMMs' capability to reason over multiple images. Recently, Mementos[^3] has attempted to benchmark LMMs' ability to comprehend image sequences and observed that the recent LMMs besides GPT-4V are achieving F1 score below 40%. In this work, we aim to enhance LMMs' capability to reason over multiple images, which include different scenarios: (1) understanding actions in multiple video frames, (2) understanding differences between images, (3) high-level operations over multiple images.
+The recent emergence of Large Multimodal Models (LMMs) such as GPT-4V[^1] and Gemini[^2] has shown strong visual-language understanding and generation capabilities in many areas, like image captioning and visual question answering. Despite obtaining the remarkable performance on most visual-language datasets, their ability to reason about multiple images has yet to be explored. Recently, there has been relatively fewer work in exploring LMMs' capability to reason over multiple images. Recently, Mementos[^3] has attempted to benchmark LMMs' ability to comprehend image sequences and observed that the recent LMMs besides GPT-4V are achieving F1 score below 40%. In this work, we aim to enhance LMMs' capability to reason over multiple images, which include different scenarios: (1) understanding actions in multiple video frames, (2) understanding differences between images, (3) high-level reasoning over multiple images.
+
+To achieve these goals, we propose **Multi-Image Instruction Tuning (MIIT)** inspired by the LLaVA's visual instruction tuning [^4]. We aim to extend existing single-image LMM's ability to multiple-image scenarios, which we hypothesize should be achieved with properly curated instruction-tuning datasets, without the need to train a new LMM from scratch. Incorporating multiple images in the training dataset also implicitly makes contrastive learning across images and texts possible, which has been proven to be a simple yet effective method for enhancing video understanding ability. 
+
+In short, our contributions to this paper can be listed as follows:
+1. **We propose MIIT**, a new training paradigm for LMMs to equip them with multi-image understanding and reasoning ability via multi-image instruction tuning.
+2. **We open-source the training and inference codes**, which support free-form text-image interleaved format to facilitate the development of multi-image LMMs in the community.
+3. **We release Mantis-Instruct**, a large-scale multi-image QA dataset curated from current publicly available datasets, which is used for `methodname`'s instruction tuning.
+4. **We announce Mantis**, a series of LMMs with decent multi-image reasoning ability based on Llava, achieving SOTA performance on a series of multi-image benchmarks.
 
 ## Methodology
 
-To train a model with multi-image reasoning ability, the model structure should be able to support embedding image patches with text token embeddings. Fuyu is a decoder-only LMM with no separate image encoder, which processes image tokens the same as text tokens. Therefore, it can naturally be modified with just the training and inference codes to support interleaved image inputs. However, due to Fuyu's high-resolution feature, the number of image tokens increases rapidly as the image gets larger, with a maximum of `1920x1080 / 30^2 = 2304` for each image, thus demanding a high context length during the training and inference. Besides Fuyu, we also consider LLaVA, which uses a CLIP encoder to first transform every image into a fixed number of image tokens, which is `(336/14)^2=576` for LLaVa-1.5. Since LLaVA-1.5's max positional embedding size is 4096, it can accept about 7 images at most, which is acceptable considering our goals and GPU resources. Therefore, we have decided to use LLaVA-1.5 as the base model for our experiments.
+To train a model with multi-image reasoning ability, the model structure should be able to support embedding image patches with text token embeddings. Fuyu is a decoder-only LMM with no separate image encoder, which processes image tokens the same as text tokens. Therefore, it can naturally be modified with just the training and inference codes to support interleaved image inputs. However, due to Fuyu's high-resolution feature, the number of image tokens increases rapidly as the image gets larger, with a maximum of `1920x1080 / 30^2 = 2304` for each image, thus demanding a high context length during the training and inference. Besides Fuyu, we also consider LLaVA, which uses a CLIP encoder to first transform every image into a fixed number of image tokens, which is `(336/14)^2=576` for LLaVa-1.5. Since LLaVA-1.5's max positional embedding size is 4096, it can accept about 7 images at most, which is acceptable considering our goals and GPU resources. Therefore, we have decided to use LLaVA-1.5 as the base model for the first version of Mantis, called **Mantis-llava**. (Mantis-Fuyu will be released in the future.)
 
 Besides the model structure consideration, it's also important to design a proper data format for our model. Similar to LLaVA, we use `<image>` as the placeholder of each image in the text, indicating where the image tokens will be inserted. However, in the multi-image scenario, the boundaries between images and the serial order of the images are not explicitly specified, thus making it hard for the model to learn it implicitly through the position embeddings. This ability decides whether the model can clarify the relationship between text denotation for the image and the actual image patches denoted. Therefore, for each `<image>` token, we will automatically replace all the images into the following format: `(image {i}: <Image><image></Image>)`, where `i` is the serial number in the sequence of images. The advantage of this technique is to build a proper attention mapping from the text image denotation to the actual image embeddings, making the learning process easier.
 
-Similar to visual instruction tuning[^4], data curation is an important step to ensure good performance. During the curation, we have found some heuristics that can improve the performance. We list them below. These heuristics are applied in the curation of the dataset, which is described in further detail elsewhere[^5].
-
-1. **Conflicts between short answers and long answers.** Many datasets we collected are domain-specific, and some of them are classification tasks like NLVR2[^6] and DreamSim[^7]. For these datasets, we convert them into multiple-choice QA format to avoid conflicts between repeated short-answers and some long answers from other datasets.
-2. **Addition of image denotation in the text for each question.**
-   We manually add image denotations like "the first image", "image 2", "the right image", etc. to each question in our dataset to make sure the question involved with multiple images is clear to answer.
-3. **Positions of the `<image>` placeholder.**
-   For each item with multiple images, we write some rules to randomly put the image placeholders at the beginning of the first question or the end of the first question. This technique is also used by the curation LLaVA-665k[^8].
-
-For now, the effects of these heuristics are not well-investigated and quantized due to the limited time and resources. We aim to investigate further in the future work.
-
+Similar to visual instruction tuning[^4], data curation is an important step to ensure good performance. During the curation, we have found some heuristics that can improve the performance. For example, we reformat some classification tasks into multiple-choice QA format to avoid conflicts between short answers and long answers. We also add image denotations in the text for each question to make sure the question involved with multiple images is clear to answer. Besides, We write some rules to randomly put the image placeholders at the beginning of the first question or the end of the first question for each item with multiple images. This technique is also used by the curation LLaVA-665k[^5].
 
 ## Mantis-Instruct: A large scale Multi-Image Question Answering dataset
-
-
-<!-- | Subsets                | # Examples (k) | # Avg image | # Max image | # Avg Turns | Avg Length(T) | Avg Length (T&I) |
-|------------------------|----------------|-------------|-------------|-------------|----------------|---------------------|
-| NLVR2                  | 86.37          | 2.00        | 2           | 2.00        | 105            | 1257                |
-| Birds-to-words         | 2.65           | 2.00        | 2           | 2.00        | 101            | 1253                |
-| Dreamsim               | 15.94          | 3.00        | 3           | 2.00        | 103            | 1831                |
-| Contrastive Captioning | 35.98          | 3.81        | 8           | 7.62        | 871            | 3067                |
-| Spot-the-diff          | 8.01           | 2.00        | 2           | 3.99        | 121            | 1273                |
-| Llava-665k-merged      | 312.61         | 1.99        | 4           | 21.44       | 558            | 1710                |
-| LRV-merged             | 8.45           | 3.50        | 9           | 83.37       | 2234           | 4251                |
-| Nexqa                  | 3.87           | 8.00        | 8           | 17.64       | 572            | 5180                |
-| Star                   | 3.03           | 8.00        | 8           | 30.16       | 961            | 5569                |
-| Visual story telling   | 6.66           | 20.33       | 50          | 9.71        | 530            | 12238               |
-| Coinstruct             | 150.92         | 2.67        | 4           | 7.45        | 314            | 1620                |
-| Dvqa                   | 200.00         | 1.00        | 1           | 40.00       | 304            | 880                 |
-| Docvqa                 | 39.46          | 1.00        | 1           | 2.00        | 62             | 638                 |
-| Chartqa                | 28.30          | 1.00        | 1           | 2.00        | 66             | 642                 |
-
-*Table 1: The statistics of Mantis-Instruct datasets. We list the number of examples, average images per example, maximum image per example, average turns, average text token lengths, and average text+image token lengths. Here we use Llava's tokenizer and assume each image occupies 576 image tokens, which is the number of tokens each image will be converted to in Llava model. Here "Avg Length(T)" denotes the average number of tokens for the text part, while "Avg Length(T&I)" means the average number of tokens of text and images in total.* -->
 
 We curate datasets from multiple publicly available datasets to satisfy the training requirements above, forming Mantis-Instruct. We use a similar dataset format with LLaVA's, where the difference is that each data item contains multiple images. Multiple turns of QA pairs are gathered for each item.
 
@@ -101,12 +80,12 @@ QBench is a benchmark evaluating whether LMMs can properly judge and compare the
 | Llava           | 53.88 | 36.20          | 31.34      |
 | Kosmos2         | 49.00 | 31.75          | 30.41      |
 | fuyu            | 51.10 | 28.19          | 27.19      |
-| Mantis-7b-v1.0  | **84.93** | **52.52**  | 45.16      |
-| Mantis-7b-v1.1  | 82.98 | 43.62          | **50.69**  |
+| Mantis-llava-7b-v1.0  | **84.93** | **52.52**  | 45.16      |
+| Mantis-llava-7b-v1.1  | 82.98 | 43.62          | **50.69**  |
 
-*Table 2: The performance of Mantis-7b-v1.0 and Mantis-7b-v1.1 on NLVR2, Birds-to-words, and Mantis-Instruct-eval evaluation.*
+*Table 2: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on NLVR2, Birds-to-words, and Mantis-Instruct-eval evaluation.*
 
-We report results on birds-to-words, NLVR2, and our curated human-eval benchmark. As shown in the table, our model achieves decent performance on the benchmarks. Specifically, Mantis-7b-v1.0 gets 84.93 on NLVR2 and 52.52 accuracies on Birds-to-words. Mantis-7b-v1.1 gets 50.69 on the Human-eval subset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
+We report results on birds-to-words, NLVR2, and our curated human-eval benchmark. As shown in the table, our model achieves decent performance on the benchmarks. Specifically, Mantis-llava-7b-v1.0 gets 84.93 on NLVR2 and 52.52 accuracies on Birds-to-words. Mantis-llava-7b-v1.1 gets 50.69 on the Human-eval subset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
 
 ### Evaluation on Qbench2
 
@@ -124,39 +103,36 @@ We report results on birds-to-words, NLVR2, and our curated human-eval benchmark
 | Qwen-VL-Max (Close-Source)    | 67.27 |
 | Gemini-Pro (Close-Source)     | 57.64 |
 | GPT-4V (Close-Source)         | 76.52 |
-| Mantis-7b-v1.0                | 52.30 |
-| Mantis-7b-v1.1                | **72.00** |
+| Mantis-llava-7b-v1.0                | 52.30 |
+| Mantis-llava-7b-v1.1                | **72.00** |
 
-*Table 3: The performance of Mantis-7b-v1.0 and Mantis-7b-v1.1 on Qbench2-A1-single-dev evaluation.*
+*Table 3: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on Qbench2-A1-single-dev evaluation.*
 
 On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses all previous open-source LMMs reported in the leaderboard. After introducing the co-instruct training data, the performance further increases to 72.00 accuracy, which surpasses 3 close-source models and is only behind GPT-4V by 4.52. However, there are some performance decreases on the 2 held-in datasets NLVR2 and Birds-to-words. We attribute it to be the trade-off across various datasets. Besides, the performance on the held-in evaluation dataset after the decreases of our model still surpasses the baseline models for the NLVR2 dataset. For Birds-to-words evaluation datasets, our model is only behind BLIP2 by 2.08.
 
 ### Evaluation on Mementos
 
-![Table 4: The performance of Mantis-7b-v1.1 on Mementos behavior recognition evaluation.]({{"/assets/Mantis/images/mementos.png" | relative_url }})
+![Table 4: The performance of Mantis-llava-7b-v1.1 on Mementos behavior recognition evaluation.]({{"/assets/Mantis/images/mementos.jpeg" | relative_url }})
 
 We also evaluated our model on the Mementos benchmark on the 3 subdomains, daily life, robotics, and comics. Results are shown as follows: For the daily-life domain, our model gets 36.62% F1-score for the object recognition, which is on par with Gemini. Additionally, we get 29.80% F1-score for the behavior recognition, which surpasses all other models except GPT-4. Our precision reaches 38.88% for the daily-life behavior recognition, which is the best across all the models, even better than GPT-4. This demonstrates our model's great capability to capture dynamic various across multiple image sequences.
 
 Similarly, on the other 2 subdomains, we achieve 32.38% F1-score for behavior recognition on robotics, which is way better than in previous LMMs like LLaVA-1.5 (17.95%), and Chat-UniVi (21.14%). This performance is close to GPT-4's 33.95%. On the comics domain, our model achieves a 15.99% F1-score for behavior recognition, which surpasses previous LMMs like LLaVA-1.5 by 5.72% and is only behind GPT-4V and Gemini.
 
-While we observe significant performance improvements in behavior recognition, it's also worth noting that our model, Mantis-7b-v1.1, has experienced some performance drops on the object recognition task compared to the LLaVA-1.5 models. We believe this decline is due to our training datasets being mostly comprised of tasks that require multi-image reasoning ability, thus decreasing the recognition ability for a single static image as a trade-off. This phenomenon is akin to the insect mantis, which is adept at recognizing moving and dynamic objects but struggles with static objects. This similarity is why we have named our model after this insect.
+While we observe significant performance improvements in behavior recognition, it's also worth noting that our model, Mantis-llava-7b-v1.1, has experienced some performance drops on the object recognition task compared to the LLaVA-1.5 models. We believe this decline is due to our training datasets being mostly comprised of tasks that require multi-image reasoning ability, thus decreasing the recognition ability for a single static image as a trade-off. This phenomenon is akin to the insect mantis, which is adept at recognizing moving and dynamic objects but struggles with static objects. This similarity is why we have named our model after this insect.
 
 ## Future Work
 
-Mantis is a active work in progres. We have demonstrated that Mantis-7b-v1.1 has achieved remarkable performance on various benchmarks, including NLVR2, Birds-to-words, Mementos, and Qbench2. However, there are still some limitations and future directions that we need to address, such as performance drops on single-image reasoning tasks, and the context length limitation of the model. We plan to keep improving the model's performance on single-image reasoning tasks and explore more efficient ways to handle multiple images. Larger models and more diverse datasets will be used to further improve the model's performance.
+Mantis is a active work in progres. We have demonstrated that Mantis-llava-7b-v1.1 has achieved remarkable performance on various benchmarks, including NLVR2, Birds-to-words, Mementos, and Qbench2. However, there are still some limitations and future directions that we need to address, such as performance drops on single-image reasoning tasks, and the context length limitation of the model. We plan to keep improving the model's performance on single-image reasoning tasks and explore more efficient ways to handle multiple images. Larger models and more diverse datasets will be used to further improve the model's performance.
 We also plan to investigate the effects of the heuristics we have applied in the data curation process and further improve the model's performance on multi-image reasoning tasks. We hope that our work can inspire more research in the field of multi-image reasoning and contribute to the development of large multimodal models.
 
 ## References
 
 [^1]: Achiam, J. (2023). GPT-4 Technical Report.
-[^2]: Team, C. (2023). Gemini: Understanding visual-language interactions.
-[^3]: Wang, L. (2024). Mementos: Benchmarking the understanding of image sequences.
-[^4]: Liu, Visual Instruction Tuning: Enhancing Visual Models with Instruction-Based Tuning.
-[^5]: Detailed section in supplementary materials.
-[^6]: Suhr et al. (2018). NLVR2: Understanding the role of images in model training.
-[^7]: Fu (2023). DreamSim: Simulated Dreams and Learning.
-[^8]: Liu et al. (2023). Improved Batch Weighting for LLaVA-665k: A Study on Effective Training Techniques.
-[^9]: Li et al. (2023). MIMIC-IT
+[^2]: Team, C. (2023). Gemini: A Family of Highly Capable Multimodal Models.
+[^3]: Wang, L. (2024). Mementos: A Comprehensive Benchmark for Multimodal Large Language Model Reasoning over Image Sequences.
+[^4]: Liu et al. (2023), Visual Instruction Tuning.
+[^5]: Liu et al. (2023), Improved Baselines with Visual Instruction Tuning
+<!-- [^9]: Li et al. (2023). MIMIC-IT
 [^10]: Forbes et al. (2019). Neural Network Generation of Questions for Question Answering.
 [^11]: Fu et al. (2023). DreamSim: Simulated Dreams and Learning.
 [^12]: Suhr et al. (2018). NLVR2: Understanding the role of images in model training.
@@ -166,29 +142,4 @@ We also plan to investigate the effects of the heuristics we have applied in the
 [^16]: Xiao et al. (2021). NExTQA: A Benchmark for Video Question Answering.
 [^17]: Wu et al. (2021). STAR: A Benchmark for Video Question Answering.
 [^18]: Huang et al. (2016). Visual Storytelling.
-[^19]: Ko et al. (2023). Flipped-VQA: 
-
-<!-- 
-You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
-
-Jekyll requires blog post files to be named according to the following format:
-
-`YEAR-MONTH-DAY-title.MARKUP`
-
-Where `YEAR` is a four-digit number, `MONTH` and `DAY` are both two-digit numbers, and `MARKUP` is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.
-
-Jekyll also offers powerful support for code snippets:
-
-{% highlight ruby %}
-def print_hi(name)
-  puts "Hi, #{name}"
-end
-print_hi('Tom')
-#=> prints 'Hi, Tom' to STDOUT.
-{% endhighlight %}
-
-Check out the[Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at[Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on[Jekyll Talk][jekyll-talk].
-
-[jekyll-docs]: https://jekyllrb.com/docs/home
-[jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/ -->
+[^19]: Ko et al. (2023). Flipped-VQA:  -->
