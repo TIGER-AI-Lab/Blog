@@ -3,7 +3,7 @@ layout: post
 title:  "Mantis-VL"
 date:   2024-04-12 02:21:59 -0400
 author: Dongfu Jiang, Xuan He, Huaye Zeng, Cong Wei, Max Ku, Qian Liu, Wenhu Chen
-categories: jekyll update
+# categories: jekyll update
 ---
 
 ## Introduction
