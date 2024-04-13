@@ -49,7 +49,7 @@ We release 2 versions of Mantis, [Mantis-LLaVA-7b](https://huggingface.co/TIGER-
 4. [Mementos](https://arxiv.org/abs/2401.10529): Multi-image captioning
 5. Mantis-eval: Multi-choice Question Answering curated by ourselves 
 
-## NLVR2, Birds-to-words, and Mantis-eval (Held-on)
+## NLVR2, Birds-to-words, and Mantis-eval (Held-out)
 
 | Models                | NLVR2     | Birds-to-words | Mantis-eval |
 |-----------------------|-----------|----------------|-------------|
