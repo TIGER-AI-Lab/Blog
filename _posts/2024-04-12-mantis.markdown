@@ -7,7 +7,7 @@ author: Dongfu Jiang, Xuan He, Huaye Zeng, Cong Wei, Max Ku, Qian Liu, Wenhu Che
 ---
 
 
-![Figure 1: Mantis]({{"/assets/Mantis/images/barchart.jpeg" | relative_url }})
+![Figure 1: Mantis]({{"/assets/Mantis/images/overall_barchart.jpeg" | relative_url }})
 
 # Introduction
 
@@ -41,7 +41,9 @@ Similar to LLaVA-NeXT, we include DocVQA, DVQA, and ChartQA to enhance the model
 
 # Evaluation: Multi-image evaluation set
 
-We release 2 versions of Mantis, [Mantis-LLaVA-7b](https://huggingface.co/TIGER-Lab/Mantis-llava-7b) and [Mantis-bakLLaVA-7b](https://huggingface.co/TIGER-Lab/Mantis-bakLLaVA-7b). Mantis-LLaVA-7b is trained on the Mantis-Instruct dataset, while Mantis-bakLLaVA-7b is trained on the Mantis-Instruct dataset along with [Co-Instruct](https://co-instruct.github.io/). They are based on [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf) and [llava-hf/bakLlava-v1-hf](https://huggingface.co/llava-hf/bakLlava-v1-hf) respectively. We evaluate the models on multiple benchmarks, including:
+We release 2 versions of Mantis, [Mantis-LLaVA-7b](https://huggingface.co/TIGER-Lab/Mantis-llava-7b) and [Mantis-bakLLaVA-7b](https://huggingface.co/TIGER-Lab/Mantis-bakLLaVA-7b). They are all trained on the Mantis-Instruct dataset and part of the [Co-Instruct](https://co-instruct.github.io/) dataset. They are based on [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf) and [llava-hf/bakLlava-v1-hf](https://huggingface.co/llava-hf/bakLlava-v1-hf) respectively. Due to the limitation of the backbone, Mantis-LLaVA-7b is trained with a maximum context length of 4096, while Mantis-bakLLaVA-7b is trained with a maximum context length of 8192.
+
+We evaluate the models on multiple benchmarks, including:
 
 1. [NLVR2](https://arxiv.org/abs/1811.00491): Binary Question Answer
 2. [Birds-to-words](https://arxiv.org/abs/1909.04101): Multi-choice Question Answering
@@ -54,14 +56,14 @@ We release 2 versions of Mantis, [Mantis-LLaVA-7b](https://huggingface.co/TIGER-
 | Models                | NLVR2     | Birds-to-words | Mantis-eval |
 |-----------------------|-----------|----------------|------------|
 | Random                | 48.93     | 31.16          | 23.04      |
-| Blip-2                | 59.42     | 45.70          | 49.77      |
+| Blip-2                | 59.42     | 45.10          | 49.77      |
 | InstructBlip          | 60.26     | 42.43          | 45.62      |
 | QwenVL                | 58.72     | 31.45          | 39.17      |
 | Llava                 | 53.88     | 36.20          | 31.34      |
 | Kosmos2               | 49.00     | 31.75          | 30.41      |
 | fuyu                  | 51.10     | 28.19          | 27.19      |
 | Mantis-LLaVA-7b  | **82.00** | **52.23**      | 46.08      |
-| Mantis-bakLLaVA-7b  | 82.98     | 43.62          | **50.69**  |
+| Mantis-bakLLaVA-7b  | 82.98     | 47.48          | **50.69**  |
 
 *Table 1: The performance of Mantis-LLaVA-7b and Mantis-bakLLaVA-7b on NLVR2, Birds-to-words, and Mantis-eval.*
 
@@ -100,9 +102,8 @@ Mementos is a benchmark to test multiple image sequence reasoning ability. It ev
 We report the performance in 3 domains daily life, robotics, and comics. Results are shown in Table 3. Mantis-bakLLaVA-7b achieves 29.80%, 32.38%, and 15.99% F1-score on the daily life, robotics, and comics domains, respectively. Our model surpasses all the previous open-source LMMs. The performance in the daily life domain is only behind GPT-4. We found that Mantis is particularly good at capturing information from dynamic scenes where multiple images are involved. This phenomenon is akin to the insect mantis, which is adept at recognizing moving and dynamic objects but struggles with static objects. This similarity is why we have named our model after this insect.
 
 ## Single-Image Reasoning
-![Figure 3: Mantis-LLaVA-7b on single image VQA.]({{"/assets/Mantis/images/barchart_single_image_vqa.jpeg" | relative_url }})
 
-We also evaluate the performance of Mantis-LLaVA-7b on single-image reasoning tasks, including AI2D, GQA, InfoVQA, MME-C(ognition), MME-P(ception), MMMU, OKVQA, TextVQA. The results are shown in Figure 3. After training on the Mantis-Instruct dataset, Mantis-LLaVA maintains the performance on single-image reasoning tasks compared to its base model LLaVA-1.5-7b. Surprisingly, the performance on the AI2D, InfoVQA, MME-C, MMMU, and TextVQA all get significant improvements. 
+We also evaluate the performance of Mantis-LLaVA-7b on single-image reasoning tasks, including AI2D, GQA, InfoVQA, MME-C(ognition), MME-P(ception), MMMU, OKVQA, TextVQA. The results are shown in Figure 1. After training on the Mantis-Instruct dataset, Mantis-LLaVA maintains the performance on single-image reasoning tasks compared to its base model LLaVA-1.5-7b. Surprisingly, the performance on the AI2D, InfoVQA, MME-C, MMMU, and TextVQA all get significant improvements. 
 
 # Ongoing Work
 
