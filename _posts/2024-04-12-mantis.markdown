@@ -54,7 +54,7 @@ We release 2 versions of Mantis, [Mantis-llava-7b-v1.0](https://huggingface.co/T
 | Mantis-llava-7b-v1.0  | **84.93** | **52.52**      | 45.16      |
 | Mantis-llava-7b-v1.1  | 82.98     | 43.62          | **50.69**  |
 
-*Table 1: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on NLVR2, Birds-to-words, and Mantis-eval evaluation.*
+*Table 1: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on NLVR2, Birds-to-words, and Mantis-eval.*
 
 We reformat the test set of NLVR2 and Birds-to-words into a multi-choice format, then evaluate the models on the Mantis-eval evaluation dataset. We curated 200+ multi-image inference examples that cover different topics. 
 The images are collected by our annotators via Google Search, and then come up with a proper question for the chosen topics. They are all multi-choice questions. For those models that cannot accept multiple images as input, we merge the images into a single one, putting them side by side.
