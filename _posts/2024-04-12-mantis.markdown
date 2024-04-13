@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Mantis: Multi-Image Instruction Tuning"
+title:  "Mantis: Interleaved Multi-Image Instruction Tuning"
 date:   2024-04-12 02:21:59 -0400
 author: Dongfu Jiang, Xuan He, Huaye Zeng, Cong Wei, Max Ku, Qian Liu, Wenhu Chen
 # categories: jekyll update
@@ -14,11 +14,11 @@ While many previous works have focused on single-image reasoning tasks, the abil
 
 ## Methodology
 
-We have modifed the famous Fuyu and LLaVA's training and inference codes to support **interleaved text-image inputs**. In this version, we use LLaVA-1.5 as the base model for the first version of Mantis, called **Mantis-llava**. (Mantis-Fuyu will be released in the future.)
+We have modifed the Fuyu and LLaVA's training and inference codes to support **interleaved text-image inputs**. In this version, we use LLaVA-1.5 as the base model for the first version of Mantis, called **Mantis-llava**. (Mantis-Fuyu will be released in the future.)
 
 Similar to LLaVA, we use `<image>` as the placeholder of each image in the text. Besides, for each `<image>` token, we will automatically replace all the images into the following format: `(image {i}: <Image><image></Image>)`, where `i` is the serial number in the sequence of images. 
 
-## Mantis-Instruct: A large scale Multi-Image Question Answering dataset
+## Training: Mantis-Instruct dataset
 
 ![Figure 2: Illustrations of parts of the datasets in Mantis-Instruct]({{"/assets/Mantis/images/mantis-instruct-cases.jpeg" | relative_url }})
 
@@ -36,32 +36,35 @@ The third part reformats previous single-image multi-turn instruction-following 
 **4. Single-Image Reasoning.**
 Similar to LLaVA-NeXT, we include DocVQA, DVQA, and ChartQA to enhance the model's ability on diagrams and OCR. This is also to avoid the model forgetting ability on single-image reasoning.
 
-## Experiment Results
+## Evaluation: Multi-image evaluation set
 
-We release 2 versions of Mantis, [Mantis-llava-7b-v1.0](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.0) and [Mantis-llava-7b-v1.1](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.1). Mantis-llava-7b-v1.0 is trained on the Mantis-Instruct dataset, while Mantis-llava-7b-v1.1 is trained on the Mantis-Instruct dataset along with Co-Instruct[^6] training data. They are based on [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf) and [llava-hf/bakLlava-v1-hf](https://huggingface.co/llava-hf/bakLlava-v1-hf) respectively. We evaluate the models on multiple benchmarks, including NLVR2, Birds-to-words, Mantis-Instruct-eval, Qbench2, and Mementos.
+We release 2 versions of Mantis, [Mantis-llava-7b-v1.0](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.0) and [Mantis-llava-7b-v1.1](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.1). Mantis-llava-7b-v1.0 is trained on the Mantis-Instruct dataset, while Mantis-llava-7b-v1.1 is trained on the Mantis-Instruct dataset along with [Co-Instruct](https://co-instruct.github.io/). They are based on [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf) and [llava-hf/bakLlava-v1-hf](https://huggingface.co/llava-hf/bakLlava-v1-hf) respectively. We evaluate the models on multiple benchmarks, including:
 
-### Evaluation on NLVR2, Birds-to-words, and Mantis-Instruct-eval
+1. [NLVR2](https://arxiv.org/abs/1811.00491): Binary Question Answer
+2. [Birds-to-words](https://arxiv.org/abs/1909.04101): Multi-choice Question Answering
+3. [Qbench2](https://arxiv.org/abs/2309.14181): Binary Question Answering
+4. [Mementos](https://arxiv.org/abs/2401.10529): Multi-image captioning
+5. Mantis-eval: Multi-choice Question Answering curated by ourselves 
 
-| Models          | NLVR2 | Birds-to-words | Mantis-Instruct-eval |
-|-----------------|-------|----------------|------------|
-| Random          | 48.93 | 31.16          | 23.04      |
-| Blip-2          | 59.42 | 45.70          | 49.77      |
-| InstructBlip    | 60.26 | 42.43          | 45.62      |
-| QwenVL          | 58.72 | 31.45          | 39.17      |
-| Llava           | 53.88 | 36.20          | 31.34      |
-| Kosmos2         | 49.00 | 31.75          | 30.41      |
-| fuyu            | 51.10 | 28.19          | 27.19      |
-| Mantis-llava-7b-v1.0  | **84.93** | **52.52**  | 45.16      |
-| Mantis-llava-7b-v1.1  | 82.98 | 43.62          | **50.69**  |
+### NLVR2, Birds-to-words, and Mantis-eval
 
-*Table 1: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on NLVR2, Birds-to-words, and Mantis-Instruct-eval evaluation.*
+| Models                | NLVR2     | Birds-to-words | Mantis-eval |
+|-----------------------|-----------|----------------|------------|
+| Random                | 48.93     | 31.16          | 23.04      |
+| Blip-2                | 59.42     | 45.70          | 49.77      |
+| InstructBlip          | 60.26     | 42.43          | 45.62      |
+| QwenVL                | 58.72     | 31.45          | 39.17      |
+| Llava                 | 53.88     | 36.20          | 31.34      |
+| Kosmos2               | 49.00     | 31.75          | 30.41      |
+| fuyu                  | 51.10     | 28.19          | 27.19      |
+| Mantis-llava-7b-v1.0  | **84.93** | **52.52**      | 45.16      |
+| Mantis-llava-7b-v1.1  | 82.98     | 43.62          | **50.69**  |
 
-We reformat the test set of NLVR2 and Birds-to-words into a multi-choice format, then evaluate the models on the Mantis-Instruct-eval evaluation dataset. We curated 200+ multi-image inference examples that cover different topics. 
-The images are collected by our annotators via Google Search, and then come up with a proper question for the chosen topics. They are all multi-choice questions. For those models that cannot accept multiple images as input, we merge the images into a single one, putting them side by side.
+*Table 1: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on NLVR2, Birds-to-words, and Mantis-eval.*
 
-As shown in Table 1, our model achieves decent performance on the benchmarks. Specifically, Mantis-llava-7b-v1.0 gets 84.93 on NLVR2 and 52.52 accuracies on Birds-to-words. Mantis-llava-7b-v1.1 gets 50.69 on the Mantis-Instruct-eval subset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
+As shown in Table 1, our model achieves decent performance on the benchmarks. Specifically, Mantis-llava-7b-v1.0 gets 84.93 on NLVR2 and 52.52 accuracies on Birds-to-words. Mantis-llava-7b-v1.1 gets 50.69 on the Mantis-eval dataset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
 
-### Evaluation on Qbench2
+### Qbench2
 
 | Models                        | Acc   |
 |-------------------------------|-------|
@@ -85,7 +88,7 @@ As shown in Table 1, our model achieves decent performance on the benchmarks. Sp
 QBench is a benchmark evaluating whether LMMs can properly judge and compare the quality of a benchmark.
 On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses all previous open-source LMMs reported in the leaderboard. After introducing the co-instruct training data, the performance further increases to 72.00 accuracy, which surpasses 3 close-source models and is only behind GPT-4V by 4.52. However, there are some performance decreases on the 2 held-in datasets NLVR2 and Birds-to-words. We attribute it to be the trade-off across various datasets. Besides, the performance on the held-in evaluation dataset after the decreases of our model still surpasses the baseline models for the NLVR2 dataset. For Birds-to-words evaluation datasets, our model is only behind BLIP2 by 2.08.
 
-### Evaluation on Mementos
+### Mementos
 
 ![Table 3: The performance of Mantis-llava-7b-v1.1 on Mementos behavior recognition evaluation.]({{"/assets/Mantis/images/mementos.jpeg" | relative_url }})
 
@@ -93,7 +96,7 @@ Mementos is a benchmark to test multiple image sequence reasoning ability. It ev
 
 We report the performance in 3 domains daily life, robotics, and comics. Results are shown in Table 3. Mantis-llava-7b-v1.1 achieves 29.80%, 32.38%, and 15.99% F1-score on the daily life, robotics, and comics domains, respectively. Our model surpasses all the previous open-source LMMs. The performance in the daily life domain is only behind GPT-4. We found that Mantis is particularly good at capturing information from dynamic scenes where multiple images are involved. This phenomenon is akin to the insect mantis, which is adept at recognizing moving and dynamic objects but struggles with static objects. This similarity is why we have named our model after this insect.
 
-## Future Work
+## Ongoing Work
 
 Mantis is a active work in progres. We have demonstrated that Mantis-llava-7b-v1.1 has achieved remarkable performance on various benchmarks, including NLVR2, Birds-to-words, Mementos, and Qbench2. However, there are still some limitations and future directions that we need to address, such as performance drops on single-image reasoning tasks, and the context length limitation of the model. We plan to keep improving the model's performance on single-image reasoning tasks and explore more efficient ways to handle multiple images. Larger models and more diverse datasets will be used to further improve the model's performance.
 We also plan to investigate the effects of the heuristics we have applied in the data curation process and further improve the model's performance on multi-image reasoning tasks. We hope that our work can inspire more research in the field of multi-image reasoning and contribute to the development of large multimodal models.
@@ -105,23 +108,3 @@ We also plan to investigate the effects of the heuristics we have applied in the
 - 🤗 [Mantis-llava-7b-v1.0](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.0)
 - 🤗 [Mantis-llava-7b-v1.1](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.1)
 - 🤗 Mantis-Instruct (will be released soon)
-
-## References
-
-[^1]: Achiam, J. (2023). GPT-4 Technical Report.
-[^2]: Team, C. (2023). Gemini: A Family of Highly Capable Multimodal Models.
-[^3]: Wang, L. (2024). Mementos: A Comprehensive Benchmark for Multimodal Large Language Model Reasoning over Image Sequences.
-[^4]: Liu et al. (2023), Visual Instruction Tuning.
-[^5]: Liu et al. (2023), Improved Baselines with Visual Instruction Tuning
-[^6]: Wu et al. (2023), Towards Open-ended Visual Quality Comparison
-<!-- [^9]: Li et al. (2023). MIMIC-IT
-[^10]: Forbes et al. (2019). Neural Network Generation of Questions for Question Answering.
-[^11]: Fu et al. (2023). DreamSim: Simulated Dreams and Learning.
-[^12]: Suhr et al. (2018). NLVR2: Understanding the role of images in model training.
-[^13]: Chen et al. (2023). ShareGPT-4V: Sharing Visual-Language Models.
-[^14]: LAION (2023). LVIS: Large Vocabulary Instance Segmentation.
-[^15]: Wu et al. (2023). QBench: A Benchmark for Question Answering.
-[^16]: Xiao et al. (2021). NExTQA: A Benchmark for Video Question Answering.
-[^17]: Wu et al. (2021). STAR: A Benchmark for Video Question Answering.
-[^18]: Huang et al. (2016). Visual Storytelling.
-[^19]: Ko et al. (2023). Flipped-VQA:  -->
