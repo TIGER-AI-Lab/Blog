@@ -66,22 +66,22 @@ As shown in Table 1, our model achieves decent performance on the benchmarks. Sp
 
 ### Qbench2
 
-| Models                        | Acc   |
-|-------------------------------|-------|
-| InfiMM (Zephyr-7B)            | 42.95 |
-| Emu2-Chat (LLaMA-33B)         | 50.05 |
-| Fuyu-8B (Persimmon-8B)        | 49.15 |
-| BakLLava (Mistral-7B)         | 50.94 |
-| mPLUG-Owl2 (Q-Instruct)       | 50.54 |
-| mPLUG-Owl2 (LLaMA-7B)         | 49.85 |
-| LLaVA-v1.5 (Vicuna-v1.5-7B)   | 49.32 |
-| LLaVA-v1.5 (Vicuna-v1.5-13B)  | 49.85 |
-| Qwen-VL-Plus (Close-Source)   | 60.70 |
-| Qwen-VL-Max (Close-Source)    | 67.27 |
-| Gemini-Pro (Close-Source)     | 57.64 |
-| GPT-4V (Close-Source)         | 76.52 |
-| Mantis-llava-7b-v1.0                | 52.30 |
-| Mantis-llava-7b-v1.1                | **72.00** |
+| Models                        | Accuracy   |
+|-------------------------------|------------|
+| InfiMM (Zephyr-7B)            | 42.95      |
+| Emu2-Chat (LLaMA-33B)         | 50.05      |
+| Fuyu-8B (Persimmon-8B)        | 49.15      |
+| BakLLava (Mistral-7B)         | 50.94      |
+| mPLUG-Owl2 (Q-Instruct)       | 50.54      |
+| mPLUG-Owl2 (LLaMA-7B)         | 49.85      |
+| LLaVA-v1.5 (Vicuna-v1.5-7B)   | 49.32      |
+| LLaVA-v1.5 (Vicuna-v1.5-13B)  | 49.85      |
+| Qwen-VL-Plus (Close-Source)   | 60.70      |
+| Qwen-VL-Max (Close-Source)    | 67.27      |
+| Gemini-Pro (Close-Source)     | 57.64      |
+| GPT-4V (Close-Source)         | 76.52      |
+| Mantis-llava-7b-v1.0          | 52.30      |
+| Mantis-llava-7b-v1.1          | **72.00** |
 
 *Table 2: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on Qbench2-A1-single-dev evaluation.*
 
