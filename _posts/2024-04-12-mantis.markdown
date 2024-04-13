@@ -6,6 +6,9 @@ author: Dongfu Jiang, Xuan He, Huaye Zeng, Cong Wei, Max Ku, Qian Liu, Wenhu Che
 # categories: jekyll update
 ---
 
+
+![Figure 1: Mantis]({{"/assets/Mantis/images/barchart.jpeg" | relative_url }})
+
 ## Introduction
 
 While many previous works have focused on single-image reasoning tasks, the ability to reason over multiple images is still an open challenge. **Can we enhance large multimodal models with multi-image reasoning ability via instruction tuning?**. To achieve this goal, we propose **Mantis**, a series of LMMs with decent multi-image reasoning ability, achieving SOTA performance on a series of multi-image benchmarks. Mantis is trained on the newly curated dataset **Mantis-Instruct**, a large-scale multi-image QA dataset that covers various multi-image reasoning tasks.
