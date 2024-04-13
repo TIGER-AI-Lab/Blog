@@ -49,51 +49,65 @@ We release 2 versions of Mantis, [Mantis-LLaVA-7b](https://huggingface.co/TIGER-
 4. [Mementos](https://arxiv.org/abs/2401.10529): Multi-image captioning
 5. Mantis-eval: Multi-choice Question Answering curated by ourselves 
 
-## NLVR2, Birds-to-words, and Mantis-eval
+## NLVR2, Birds-to-words, and Mantis-eval (Held-on)
 
 | Models                | NLVR2     | Birds-to-words | Mantis-eval |
-|-----------------------|-----------|----------------|------------|
-| Random                | 48.93     | 31.16          | 23.04      |
-| Blip-2                | 59.42     | 45.70          | 49.77      |
-| InstructBlip          | 60.26     | 42.43          | 45.62      |
-| QwenVL                | 58.72     | 31.45          | 39.17      |
-| Llava                 | 53.88     | 36.20          | 31.34      |
-| Kosmos2               | 49.00     | 31.75          | 30.41      |
-| fuyu                  | 51.10     | 28.19          | 27.19      |
-| Mantis-LLaVA-7b  | **82.00** | **52.23**      | 46.08      |
-| Mantis-bakLLaVA-7b  | 82.98     | 43.62          | **50.69**  |
+|-----------------------|-----------|----------------|-------------|
+| Random                | 48.93     | 31.16          | 23.04       |
+| fuyu                  | 51.10     | 28.19          | 27.19       |
+| Kosmos2               | 49.00     | 31.75          | 30.41       |
+| Llava                 | 53.88     | 36.20          | 31.34       |
+| QwenVL                | 58.72     | 31.45          | 39.17       |
+| InstructBlip          | 60.26     | 42.43          | 45.62       |
+| Blip-2                | 59.42     | 45.70          | 49.77       |
+| Mantis-LLaVA-7b       | **82.00** | **52.23**      | 46.08       |
+| Mantis-bakLLaVA-7b    | 82.98     | 43.62          | **50.69**   |
 
 *Table 1: The performance of Mantis-LLaVA-7b and Mantis-bakLLaVA-7b on NLVR2, Birds-to-words, and Mantis-eval.*
 
 As shown in Table 1, our model achieves decent performance on the benchmarks. Specifically, Mantis-LLaVA-7b gets 82.00 on NLVR2 and 52.23 accuracies on Birds-to-words. Mantis-bakLLaVA-7b gets 50.69 on the Mantis-eval dataset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
 
-## Qbench2
+## Qbench2 (Held-out)
 
 | Models                        | Accuracy   |
 |-------------------------------|------------|
-| InfiMM (Zephyr-7B)            | 42.95      |
-| Emu2-Chat (LLaMA-33B)         | 50.05      |
-| Fuyu-8B (Persimmon-8B)        | 49.15      |
-| BakLLava (Mistral-7B)         | 50.94      |
-| mPLUG-Owl2 (Q-Instruct)       | 50.54      |
-| mPLUG-Owl2 (LLaMA-7B)         | 49.85      |
-| LLaVA-v1.5 (Vicuna-v1.5-7B)   | 49.32      |
-| LLaVA-v1.5 (Vicuna-v1.5-13B)  | 49.85      |
-| Qwen-VL-Plus (Close-Source)   | 60.70      |
-| Qwen-VL-Max (Close-Source)    | 67.27      |
-| Gemini-Pro (Close-Source)     | 57.64      |
-| GPT-4V (Close-Source)         | 76.52      |
-| Mantis-LLaVA-7b          | 68.7      |
-| Mantis-bakLLaVA-7b          | **72.00** |
+| GPT-4V (Close-Source)         | **76.5**  |
+| Gemini-Pro (Close-Source)     | 57.6      |
+| InfiMM (Zephyr-7B)            | 42.9      |
+| Fuyu-8B (Persimmon-8B)        | 49.1      |
+| mPLUG-Owl2 (LLaMA-7B)         | 49.8      |
+| LLaVA-v1.5 (Vicuna-v1.5-7B)   | 49.3      |
+| LLaVA-v1.5 (Vicuna-v1.5-13B)  | 49.8      |
+| Emu2-Chat (LLaMA-33B)         | 50.0      |
+| mPLUG-Owl2 (Q-Instruct)       | 50.5      |
+| BakLLava (Mistral-7B)         | 50.9      |
+| Qwen-VL-Plus (Close-Source)   | 60.7      |
+| Qwen-VL-Max (Close-Source)    | 67.2      |
+| Mantis-LLaVA-7b               | 68.7      |
+| Mantis-bakLLaVA-7b            | **72.0**  |
 
 *Table 2: The performance of Mantis-LLaVA-7b and Mantis-bakLLaVA-7b on Qbench2-A1-pair-dev evaluation.*
 
 QBench is a benchmark evaluating whether LMMs can properly judge and compare the quality of a benchmark.
 On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses all previous open-source LMMs reported in the leaderboard. After introducing the co-instruct training data, the performance further increases to 72.00 accuracy, which surpasses 3 close-source models and is only behind GPT-4V by 4.52. However, there are some performance decreases on the 2 held-in datasets NLVR2 and Birds-to-words. We attribute it to be the trade-off across various datasets. Besides, the performance on the held-in evaluation dataset after the decreases of our model still surpasses the baseline models for the NLVR2 dataset. For Birds-to-words evaluation datasets, our model is only behind BLIP2 by 2.08.
 
-## Mementos
+## Mementos (Held-out)
 
-![Table 3: The performance of Mantis-bakLLaVA-7b on Mementos behavior recognition evaluation.]({{"/assets/Mantis/images/mementos.jpeg" | relative_url }})
+| Models                        | Daily-Life   |   Robotics   |  Comics |    Avg     |
+|-------------------------------|--------------|--------------|---------|------------|
+| GPT-4V                        | 33.5         |   33.9       |  18.1   |  **28.50** |
+| Gemini                        | 21.6         |   39.4       |  16.3   |  25.77     |
+| Video-LLaMA-2                 | 20.1         |   11.2       |  6.8    |  12.70     |
+| Chat-UniVi                    | 24.9         |   21.1       |  11.9   |  19.30     |
+| LLaVa-1.5                     | 26.6         |   17.9       |  10.2   |  18.23     |
+| MiniGPT-4                     | 19.4         |   7.7        |  7.9    |  11.67     |
+| MiniGPT-5                     | 19.8         |   5.4        |  9.9    |  11.70     |
+| mPLUG-Owl-v2                  | 22.1         |   19.5       |  11.7   |  17.77     |
+| InstructBLIP                  | 24.5         |   22.7       |  8.9    |  18.70     |
+| Mantis-bakLLaVA-7b            | 29.8         |   32.4       |  16.0   |  **26.07** |
+
+*Table 3: The performance of Mantis-bakLLaVA-7b on Mementos behavior recognition evaluation.*
+
 
 Mementos is a benchmark to test multiple image sequence reasoning ability. It evaluates whether LMMs can accurately capture the contents in the image sequences, understand the situations, and then generate a detailed description of the provided image sequence. The evaluation will require GPT-4 to extract an action list and an object list described in the generated text, then compare with the reference description with precision, recall, and F1-score.
 
