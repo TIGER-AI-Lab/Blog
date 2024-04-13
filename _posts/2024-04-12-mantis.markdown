@@ -108,7 +108,7 @@ On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses a
 | InstructBLIP                  | 24.5         |   22.7       |  8.9    |  18.70     |
 | Mantis-bakLLaVA-7b            | 29.8         |   32.4       |  16.0   |  **26.07** |
 
-*Table 3: The performance of Mantis-bakLLaVA-7b on Mementos behavior recognition evaluation.*
+*Table 3: The performance of Mantis-bakLLaVA-7b on Mementos behavior recognition evaluation. (F1-score)*
 
 
 Mementos is a benchmark to test multiple image sequence reasoning ability. It evaluates whether LMMs can accurately capture the contents in the image sequences, understand the situations, and then generate a detailed description of the provided image sequence. The evaluation will require GPT-4 to extract an action list and an object list described in the generated text, then compare with the reference description with precision, recall, and F1-score.
