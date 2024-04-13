@@ -80,7 +80,7 @@ As shown in Table 1, our model achieves decent performance on the benchmarks. Sp
 | Mantis-llava-7b-v1.0                | 52.30 |
 | Mantis-llava-7b-v1.1                | **72.00** |
 
-*Table 2: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on Qbench2-A1-single-dev evaluation.*
+*Table 2: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on Qbench2-A1-pair-dev evaluation.*
 
 QBench is a benchmark evaluating whether LMMs can properly judge and compare the quality of a benchmark.
 On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses all previous open-source LMMs reported in the leaderboard. After introducing the co-instruct training data, the performance further increases to 72.00 accuracy, which surpasses 3 close-source models and is only behind GPT-4V by 4.52. However, there are some performance decreases on the 2 held-in datasets NLVR2 and Birds-to-words. We attribute it to be the trade-off across various datasets. Besides, the performance on the held-in evaluation dataset after the decreases of our model still surpasses the baseline models for the NLVR2 dataset. For Birds-to-words evaluation datasets, our model is only behind BLIP2 by 2.08.
