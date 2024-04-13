@@ -38,28 +38,28 @@ Similar to LLaVA-NeXT, we include DocVQA, DVQA, and ChartQA to enhance the model
 
 ## Experiment Results
 
-We release 2 versions of Mantis, [Mantis-llava-7b-v1.0](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.0) and [Mantis-llava-7b-v1.1](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.1). Mantis-llava-7b-v1.0 is trained on the Mantis-Instruct dataset, while Mantis-llava-7b-v1.1 is trained on the Mantis-Instruct dataset along with Co-Instruct[^6] training data. They are based on [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf) and [llava-hf/bakLlava-v1-hf](https://huggingface.co/llava-hf/bakLlava-v1-hf) respectively. We evaluate the models on multiple benchmarks, including NLVR2, Birds-to-words, Mantis-Instruct-eval, Qbench2, and Mementos.
+We release 2 versions of Mantis, [Mantis-llava-7b-v1.0](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.0) and [Mantis-llava-7b-v1.1](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.1). Mantis-llava-7b-v1.0 is trained on the Mantis-Instruct dataset, while Mantis-llava-7b-v1.1 is trained on the Mantis-Instruct dataset along with Co-Instruct[^6] training data. They are based on [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf) and [llava-hf/bakLlava-v1-hf](https://huggingface.co/llava-hf/bakLlava-v1-hf) respectively. We evaluate the models on multiple benchmarks, including NLVR2, Birds-to-words, Mantis-eval, Qbench2, and Mementos.
 
-### Evaluation on NLVR2, Birds-to-words, and Mantis-Instruct-eval
+### Evaluation on NLVR2, Birds-to-words, and Mantis-eval
 
-| Models          | NLVR2 | Birds-to-words | Mantis-Instruct-eval |
-|-----------------|-------|----------------|------------|
-| Random          | 48.93 | 31.16          | 23.04      |
-| Blip-2          | 59.42 | 45.70          | 49.77      |
-| InstructBlip    | 60.26 | 42.43          | 45.62      |
-| QwenVL          | 58.72 | 31.45          | 39.17      |
-| Llava           | 53.88 | 36.20          | 31.34      |
-| Kosmos2         | 49.00 | 31.75          | 30.41      |
-| fuyu            | 51.10 | 28.19          | 27.19      |
-| Mantis-llava-7b-v1.0  | **84.93** | **52.52**  | 45.16      |
-| Mantis-llava-7b-v1.1  | 82.98 | 43.62          | **50.69**  |
+| Models                | NLVR2     | Birds-to-words | Mantis-eval |
+|-----------------------|-----------|----------------|------------|
+| Random                | 48.93     | 31.16          | 23.04      |
+| Blip-2                | 59.42     | 45.70          | 49.77      |
+| InstructBlip          | 60.26     | 42.43          | 45.62      |
+| QwenVL                | 58.72     | 31.45          | 39.17      |
+| Llava                 | 53.88     | 36.20          | 31.34      |
+| Kosmos2               | 49.00     | 31.75          | 30.41      |
+| fuyu                  | 51.10     | 28.19          | 27.19      |
+| Mantis-llava-7b-v1.0  | **84.93** | **52.52**      | 45.16      |
+| Mantis-llava-7b-v1.1  | 82.98     | 43.62          | **50.69**  |
 
-*Table 1: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on NLVR2, Birds-to-words, and Mantis-Instruct-eval evaluation.*
+*Table 1: The performance of Mantis-llava-7b-v1.0 and Mantis-llava-7b-v1.1 on NLVR2, Birds-to-words, and Mantis-eval evaluation.*
 
-We reformat the test set of NLVR2 and Birds-to-words into a multi-choice format, then evaluate the models on the Mantis-Instruct-eval evaluation dataset. We curated 200+ multi-image inference examples that cover different topics. 
+We reformat the test set of NLVR2 and Birds-to-words into a multi-choice format, then evaluate the models on the Mantis-eval evaluation dataset. We curated 200+ multi-image inference examples that cover different topics. 
 The images are collected by our annotators via Google Search, and then come up with a proper question for the chosen topics. They are all multi-choice questions. For those models that cannot accept multiple images as input, we merge the images into a single one, putting them side by side.
 
-As shown in Table 1, our model achieves decent performance on the benchmarks. Specifically, Mantis-llava-7b-v1.0 gets 84.93 on NLVR2 and 52.52 accuracies on Birds-to-words. Mantis-llava-7b-v1.1 gets 50.69 on the Mantis-Instruct-eval subset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
+As shown in Table 1, our model achieves decent performance on the benchmarks. Specifically, Mantis-llava-7b-v1.0 gets 84.93 on NLVR2 and 52.52 accuracies on Birds-to-words. Mantis-llava-7b-v1.1 gets 50.69 on the Mantis-eval dataset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
 
 ### Evaluation on Qbench2
 
@@ -100,7 +100,7 @@ We also plan to investigate the effects of the heuristics we have applied in the
 
 ## Resources
 
-- [Code](https://github.com/TIGER-AI-Lab/Mantis)
+- ![image](https://github.com/TIGER-AI-Lab/Blog/assets/1457702/16abad05-b0b2-4857-8c27-665a5006de38)[Code](https://github.com/TIGER-AI-Lab/Mantis)
 - 🤗 [Demo](https://huggingface.co/spaces/TIGER-Lab/Mantis)
 - 🤗 [Mantis-llava-7b-v1.0](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.0)
 - 🤗 [Mantis-llava-7b-v1.1](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.1)
@@ -114,7 +114,7 @@ We also plan to investigate the effects of the heuristics we have applied in the
 [^4]: Liu et al. (2023), Visual Instruction Tuning.
 [^5]: Liu et al. (2023), Improved Baselines with Visual Instruction Tuning
 [^6]: Wu et al. (2023), Towards Open-ended Visual Quality Comparison
-<!-- [^9]: Li et al. (2023). MIMIC-IT
+[^9]: Li et al. (2023). MIMIC-IT
 [^10]: Forbes et al. (2019). Neural Network Generation of Questions for Question Answering.
 [^11]: Fu et al. (2023). DreamSim: Simulated Dreams and Learning.
 [^12]: Suhr et al. (2018). NLVR2: Understanding the role of images in model training.
