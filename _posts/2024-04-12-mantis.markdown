@@ -51,7 +51,7 @@ We evaluate the models on multiple benchmarks, including:
 4. [Mementos](https://arxiv.org/abs/2401.10529): Multi-image captioning
 5. Mantis-eval: Multi-choice Question Answering curated by ourselves 
 
-## NLVR2, Birds-to-words, and Mantis-eval (Held-out)
+### NLVR2, Birds-to-words, and Mantis-eval (Held-out)
 
 | Models                | NLVR2     | Birds-to-words | Mantis-eval |
 |-----------------------|-----------|----------------|------------|
@@ -69,7 +69,7 @@ We evaluate the models on multiple benchmarks, including:
 
 As shown in Table 1, our model achieves decent performance on the benchmarks. Specifically, Mantis-LLaVA-7b gets 82.00 on NLVR2 and 52.23 accuracies on Birds-to-words. Mantis-bakLLaVA-7b gets 50.69 on the Mantis-eval dataset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
 
-## Qbench2 (Held-out)
+### Qbench2 (Held-out)
 
 | Models                        | Accuracy   |
 |-------------------------------|------------|
@@ -93,7 +93,7 @@ As shown in Table 1, our model achieves decent performance on the benchmarks. Sp
 QBench is a benchmark evaluating whether LMMs can properly judge and compare the quality of a benchmark.
 On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses all previous open-source LMMs reported in the leaderboard. After introducing the co-instruct training data, the performance further increases to 72.00 accuracy, which surpasses 3 close-source models and is only behind GPT-4V by 4.52. However, there are some performance decreases on the 2 held-in datasets NLVR2 and Birds-to-words. We attribute it to be the trade-off across various datasets. Besides, the performance on the held-in evaluation dataset after the decreases of our model still surpasses the baseline models for the NLVR2 dataset. For Birds-to-words evaluation datasets, our model is only behind BLIP2 by 2.08.
 
-## Mementos (Held-out)
+### Mementos (Held-out)
 
 | Models                        | Daily-Life   |   Robotics   |  Comics |    Avg     |
 |-------------------------------|--------------|--------------|---------|------------|
@@ -115,7 +115,7 @@ Mementos is a benchmark to test multiple image sequence reasoning ability. It ev
 
 We report the performance in 3 domains daily life, robotics, and comics. Results are shown in Table 3. Mantis-bakLLaVA-7b achieves 29.80%, 32.38%, and 15.99% F1-score on the daily life, robotics, and comics domains, respectively. Our model surpasses all the previous open-source LMMs. The performance in the daily life domain is only behind GPT-4. We found that Mantis is particularly good at capturing information from dynamic scenes where multiple images are involved. This phenomenon is akin to the insect mantis, which is adept at recognizing moving and dynamic objects but struggles with static objects. This similarity is why we have named our model after this insect.
 
-## Single-Image Reasoning
+### Single-Image Reasoning
 
 We also evaluate the performance of Mantis-LLaVA-7b on single-image reasoning tasks, including AI2D, GQA, InfoVQA, MME-C(ognition), MME-P(ception), MMMU, OKVQA, TextVQA. The results are shown in Figure 1. After training on the Mantis-Instruct dataset, Mantis-LLaVA maintains the performance on single-image reasoning tasks compared to its base model LLaVA-1.5-7b. Surprisingly, the performance on the AI2D, InfoVQA, MME-C, MMMU, and TextVQA all get significant improvements. 
 
