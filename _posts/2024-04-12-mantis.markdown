@@ -100,7 +100,7 @@ We also plan to investigate the effects of the heuristics we have applied in the
 
 ## Resources
 
-- ![image](https://github.com/TIGER-AI-Lab/Blog/assets/1457702/16abad05-b0b2-4857-8c27-665a5006de38)[Code](https://github.com/TIGER-AI-Lab/Mantis)
+- [Code](https://github.com/TIGER-AI-Lab/Mantis)
 - 🤗 [Demo](https://huggingface.co/spaces/TIGER-Lab/Mantis)
 - 🤗 [Mantis-llava-7b-v1.0](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.0)
 - 🤗 [Mantis-llava-7b-v1.1](https://huggingface.co/TIGER-Lab/Mantis-llava-7b-v1.1)
