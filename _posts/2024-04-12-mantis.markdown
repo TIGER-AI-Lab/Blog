@@ -97,8 +97,8 @@ On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses a
 
 | Models                        | Daily-Life   |   Robotics   |  Comics |    Avg     |
 |-------------------------------|--------------|--------------|---------|------------|
-| GPT-4V                        | 33.5         |   33.9       |  18.1   |  **28.50** |
-| Gemini                        | 21.6         |   39.4       |  16.3   |  25.77     |
+| GPT-4V                        | **33.5**     |   33.9       | **18.1**|  **28.50** |
+| Gemini                        | 21.6         |   **39.4**   |  16.3   |  25.77     |
 | Video-LLaMA-2                 | 20.1         |   11.2       |  6.8    |  12.70     |
 | Chat-UniVi                    | 24.9         |   21.1       |  11.9   |  19.30     |
 | LLaVa-1.5                     | 26.6         |   17.9       |  10.2   |  18.23     |
@@ -106,9 +106,9 @@ On the Qbench2 leaderboard, our model achieves 52.30 accuracy, which surpasses a
 | MiniGPT-5                     | 19.8         |   5.4        |  9.9    |  11.70     |
 | mPLUG-Owl-v2                  | 22.1         |   19.5       |  11.7   |  17.77     |
 | InstructBLIP                  | 24.5         |   22.7       |  8.9    |  18.70     |
-| Mantis-bakLLaVA-7b            | 29.8         |   32.4       |  16.0   |  **26.07** |
+| Mantis-bakLLaVA-7b            | **29.8**     |   **32.4**   |**16.0** |  **26.07** |
 
-*Table 3: The performance of Mantis-bakLLaVA-7b on Mementos behavior recognition evaluation. (F1-score)*
+*Table 3: The performance of Mantis-bakLLaVA-7b on Mementos behavior recognition evaluation (F1-score). The highest performance of open-source LMMs, and close-source LMMs (GPT-4V and Gemini) are bold respectively in the table.*
 
 
 Mementos is a benchmark to test multiple image sequence reasoning ability. It evaluates whether LMMs can accurately capture the contents in the image sequences, understand the situations, and then generate a detailed description of the provided image sequence. The evaluation will require GPT-4 to extract an action list and an object list described in the generated text, then compare with the reference description with precision, recall, and F1-score.
