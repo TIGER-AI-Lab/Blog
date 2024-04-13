@@ -119,6 +119,12 @@ We report the performance in 3 domains daily life, robotics, and comics. Results
 
 We also evaluate the performance of Mantis-LLaVA-7b on single-image reasoning tasks, including AI2D, GQA, InfoVQA, MME-C(ognition), MME-P(ception), MMMU, OKVQA, TextVQA. The results are shown in Figure 1. After training on the Mantis-Instruct dataset, Mantis-LLaVA maintains the performance on single-image reasoning tasks compared to its base model LLaVA-1.5-7b. Surprisingly, the performance on the AI2D, InfoVQA, MME-C, MMMU, and TextVQA all get significant improvements. 
 
+### Case study
+![Figure 3: Mantis case study]({{"/assets/Mantis/images/cases.jpeg" | relative_url }})
+
+We present 2 cases where Mantis is doing do compared to LLaVA-1.5, which does not have multi-image reasoning ability, along with Emu-2 and GPT-4V, which also have multi-image reasoning ability. It is clear that Mantis is able to capture the information from multiple images and generate a more accurate answer.
+
+
 # Ongoing Work
 
 Mantis is a active work in progres. We have demonstrated that Mantis-bakLLaVA-7b has achieved remarkable performance on various benchmarks, including NLVR2, Birds-to-words, Mementos, and Qbench2. However, there are still some limitations and future directions that we need to address, such as performance drops on single-image reasoning tasks, and the context length limitation of the model. We plan to keep improving the model's performance on single-image reasoning tasks and explore more efficient ways to handle multiple images. Larger models and more diverse datasets will be used to further improve the model's performance.
