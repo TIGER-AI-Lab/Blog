@@ -41,17 +41,18 @@ Similar to LLaVA-NeXT, we include DocVQA, DVQA, and ChartQA to enhance the model
 
 # Evaluation: Multi-image evaluation set
 
-We release 2 versions of Mantis, [Mantis-LLaVA-7b](https://huggingface.co/TIGER-Lab/Mantis-llava-7b) and [Mantis-bakLLaVA-7b](https://huggingface.co/TIGER-Lab/Mantis-bakLLaVA-7b). They are all trained on the Mantis-Instruct dataset and part of the [Co-Instruct](https://co-instruct.github.io/) dataset. They are based on [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf) and [llava-hf/bakLlava-v1-hf](https://huggingface.co/llava-hf/bakLlava-v1-hf) respectively. Due to the limitation of the backbone, Mantis-LLaVA-7b is trained with a maximum context length of 4096, while Mantis-bakLLaVA-7b is trained with a maximum context length of 8192.
+We release 2 versions of Mantis, [Mantis-LLaVA-7b](https://huggingface.co/TIGER-Lab/Mantis-llava-7b) and [Mantis-bakLLaVA-7b](https://huggingface.co/TIGER-Lab/Mantis-bakLLaVA-7b). They are all trained on the Mantis-Instruct dataset and part of the [Co-Instruct](https://co-instruct.github.io/) dataset. They are based on [llava-hf/llava-1.5-7b-hf](https://huggingface.co/llava-hf/llava-1.5-7b-hf) and [llava-hf/bakLlava-v1-hf](https://huggingface.co/llava-hf/bakLlava-v1-hf) respectively. Due to the limitation of the backbone, Mantis-LLaVA-7b is trained with a maximum context length of 4096, while Mantis-bakLLaVA-7b is trained with a maximum context length of 8192. We evaluate the models on multiple benchmarks, including:
 
-We evaluate the models on multiple benchmarks, including:
-
+**Held-in evaluation dataset**:
 1. [NLVR2](https://arxiv.org/abs/1811.00491): Binary Question Answer
 2. [Birds-to-words](https://arxiv.org/abs/1909.04101): Multi-choice Question Answering
-3. [Qbench2](https://arxiv.org/abs/2309.14181): Binary Question Answering
-4. [Mementos](https://arxiv.org/abs/2401.10529): Multi-image captioning
-5. Mantis-eval: Multi-choice Question Answering curated by ourselves 
 
-### NLVR^2 (Held-in), Birds-to-words (Held-in), and Mantis-eval (Held-out)
+**Held-out evaluation dataset**:
+1. [Qbench2](https://arxiv.org/abs/2309.14181): Binary Question Answering
+2. [Mementos](https://arxiv.org/abs/2401.10529): Multi-image captioning
+3. Mantis-eval: Multi-choice Question Answering curated by ourselves 
+
+### NLVR^2, Birds-to-words, and Mantis-eval
 
 | Models                | NLVR2     | Birds-to-words | Mantis-eval|
 |-----------------------|-----------|----------------|------------|
