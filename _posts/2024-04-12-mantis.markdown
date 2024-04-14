@@ -62,12 +62,12 @@ We evaluate the models on multiple benchmarks, including:
 | Llava                 | 53.88     | 36.20          | 31.34      |
 | Kosmos2               | 49.00     | 31.75          | 30.41      |
 | fuyu                  | 51.10     | 28.19          | 27.19      |
-| Mantis-LLaVA-7b  | **82.00** | **52.23**      | 46.08      |
-| Mantis-bakLLaVA-7b  | 82.98     | 47.48          | **50.69**  |
+| Mantis-LLaVA-7b       | **82.00** | **52.23**      | 46.08      |
+| Mantis-bakLLaVA-7b    | 82.98     | 47.48          | **50.69**  |
 
 *Table 1: The performance of Mantis-LLaVA-7b and Mantis-bakLLaVA-7b on NLVR2, Birds-to-words, and Mantis-eval.*
 
-As shown in Table 1, our model achieves decent performance on the benchmarks. Specifically, Mantis-LLaVA-7b gets 82.00 on NLVR2 and 52.23 accuracies on Birds-to-words. Mantis-bakLLaVA-7b gets 50.69 on the Mantis-eval dataset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92.
+As shown in Table 1, our model achieves decent performance on the benchmarks. Specifically, Mantis-LLaVA-7b gets 82.00 on NLVR2 and 52.23 accuracies on Birds-to-words. Mantis-bakLLaVA-7b gets 50.69 on the Mantis-eval dataset, which surpasses the LLaVA-1.5 by 19.35 and BLIP2 by 0.92. Note that we only include the results from multi-model language models for NLVR2. There are stronger encoder-only models like BeiT3, which is excluded in our comparison.
 
 ### Qbench2 (Held-out)
 
