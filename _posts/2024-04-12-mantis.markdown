@@ -51,17 +51,17 @@ We evaluate the models on multiple benchmarks, including:
 4. [Mementos](https://arxiv.org/abs/2401.10529): Multi-image captioning
 5. Mantis-eval: Multi-choice Question Answering curated by ourselves 
 
-### NLVR2, Birds-to-words, and Mantis-eval (Held-out)
+### NLVR^2 (Held-in), Birds-to-words (Held-in), and Mantis-eval (Held-out)
 
-| Models                | NLVR2     | Birds-to-words | Mantis-eval |
+| Models                | NLVR2     | Birds-to-words | Mantis-eval|
 |-----------------------|-----------|----------------|------------|
 | Random                | 48.93     | 31.16          | 23.04      |
-| Blip-2                | 59.42     | 45.10          | 49.77      |
-| InstructBlip          | 60.26     | 42.43          | 45.62      |
-| QwenVL                | 58.72     | 31.45          | 39.17      |
-| Llava                 | 53.88     | 36.20          | 31.34      |
-| Kosmos2               | 49.00     | 31.75          | 30.41      |
 | fuyu                  | 51.10     | 28.19          | 27.19      |
+| Kosmos2               | 49.00     | 31.75          | 30.41      |
+| Llava                 | 53.88     | 36.20          | 31.34      |
+| QwenVL                | 58.72     | 31.45          | 39.17      |
+| InstructBlip          | 60.26     | 42.43          | 45.62      |
+| Blip-2                | 59.42     | 45.10          | 49.77      |
 | Mantis-LLaVA-7b       | **82.00** | **52.23**      | 46.08      |
 | Mantis-bakLLaVA-7b    | 82.98     | 47.48          | **50.69**  |
 
